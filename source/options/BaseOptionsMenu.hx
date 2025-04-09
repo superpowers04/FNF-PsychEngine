@@ -130,26 +130,19 @@ class BaseOptionsMenu extends MusicBeatSubstate
 			return;
 		}
 
-		if (controls.UI_UP_P)
-		{
-			changeSelection(-1);
-		}
-		if (controls.UI_DOWN_P)
-		{
-			changeSelection(1);
-		}
-
+		if (controls.UI_UP_P) changeSelection(-1);
+		if (controls.UI_DOWN_P) changeSelection(1);
+		var accept:Bool = controls.ACCEPT;
 		if (controls.BACK) {
 			close();
 			FlxG.sound.play(Paths.sound('cancelMenu'));
 		}
-
 		if(nextAccept <= 0)
 		{
 			switch(curOption.type)
 			{
 				case BOOL:
-					if(controls.ACCEPT)
+					if(accept)
 					{
 						FlxG.sound.play(Paths.sound('scrollMenu'));
 						curOption.setValue((curOption.getValue() == true) ? false : true);
@@ -158,7 +151,7 @@ class BaseOptionsMenu extends MusicBeatSubstate
 					}
 
 				case KEYBIND:
-					if(controls.ACCEPT)
+					if(accept)
 					{
 						bindingBlack = new FlxSprite().makeGraphic(1, 1, FlxColor.WHITE);
 						bindingBlack.scale.set(FlxG.width, FlxG.height);
@@ -182,9 +175,9 @@ class BaseOptionsMenu extends MusicBeatSubstate
 					}
 
 				default:
-					if(controls.UI_LEFT || controls.UI_RIGHT)
+					if(controls.UI_LEFT || controls.UI_RIGHT || accept)
 					{
-						var pressed = (controls.UI_LEFT_P || controls.UI_RIGHT_P);
+						var pressed = (controls.UI_LEFT_P || controls.UI_RIGHT_P || accept);
 						if(holdTime > 0.5 || pressed)
 						{
 							if(pressed)

@@ -55,8 +55,7 @@ class Mods
 		if(FileSystem.exists(modsFolder)) {
 			for (folder in FileSystem.readDirectory(modsFolder))
 			{
-				var path = haxe.io.Path.join([modsFolder, folder]);
-				if (FileSystem.isDirectory(path) && !ignoreModFolders.contains(folder.toLowerCase()) && !list.contains(folder))
+				if (FileSystem.isDirectory('$modsFolder/$folder') && !ignoreModFolders.contains(folder.toLowerCase()))
 					list.push(folder);
 			}
 		}

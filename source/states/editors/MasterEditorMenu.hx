@@ -20,7 +20,7 @@ class MasterEditorMenu extends MusicBeatState
 		'Note Splash Editor'
 	];
 	private var grpTexts:FlxTypedGroup<Alphabet>;
-	private var directories:Array<String> = [null];
+	private var directories:Array<String> = Mods.getModDirectories();
 
 	private var curSelected = 0;
 	private var curDirectory = 0;
@@ -61,10 +61,7 @@ class MasterEditorMenu extends MusicBeatState
 		directoryTxt.scrollFactor.set();
 		add(directoryTxt);
 		
-		for (folder in Mods.getModDirectories())
-		{
-			directories.push(folder);
-		}
+		
 
 		var found:Int = directories.indexOf(Mods.currentModDirectory);
 		if(found > -1) curDirectory = found;
@@ -129,9 +126,7 @@ class MasterEditorMenu extends MusicBeatState
 		for (num => item in grpTexts.members)
 		{
 			item.targetY = num - curSelected;
-			item.alpha = 0.6;
-			if (item.targetY == 0)
-				item.alpha = 1;
+			item.alpha = (item.targetY == 0) ? 1 : 0.6;
 		}
 		super.update(elapsed);
 	}
@@ -145,6 +140,10 @@ class MasterEditorMenu extends MusicBeatState
 	#if MODS_ALLOWED
 	function changeDirectory(change:Int = 0)
 	{
+		for (folder in Mods.getModDirectories())
+		{
+			if(!directories.contains(folder)) directories.push(folder);
+		}
 		FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
 
 		curDirectory += change;
@@ -155,14 +154,8 @@ class MasterEditorMenu extends MusicBeatState
 			curDirectory = 0;
 	
 		WeekData.setDirectoryFromWeek();
-		if(directories[curDirectory] == null || directories[curDirectory].length < 1)
-			directoryTxt.text = '< No Mod Directory Loaded >';
-		else
-		{
-			Mods.currentModDirectory = directories[curDirectory];
-			directoryTxt.text = '< Loaded Mod Directory: ' + Mods.currentModDirectory + ' >';
-		}
-		directoryTxt.text = directoryTxt.text.toUpperCase();
+		if(directories[curDirectory] == null || directories[curDirectory].length < 1) directoryTxt.text = '< No Mod Directory Loaded >';
+		else directoryTxt.text = '< Loaded Mod Directory: ' + (Mods.currentModDirectory = directories[curDirectory]) + ' >';
 	}
 	#end
 }

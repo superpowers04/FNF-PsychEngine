@@ -64,8 +64,9 @@ class WeekData {
 	// HELP: Is there any way to convert a WeekFile to WeekData without having to put all variables there manually? I'm kind of a noob in haxe lmao
 	public function new(weekFile:WeekFile, fileName:String) {
 		// here ya go - MiguelItsOut
+		var fields = Reflect.fields(this);
 		for (field in Reflect.fields(weekFile))
-			if(Reflect.fields(this).contains(field)) // Reflect.hasField() won't fucking work :/
+			if(fields.contains(field)) // Reflect.hasField() won't fucking work :/
 				Reflect.setProperty(this, field, Reflect.getProperty(weekFile, field));
 
 		this.fileName = fileName;
@@ -92,20 +93,20 @@ class WeekData {
 				var fileToCheck:String = directories[j] + 'weeks/' + sexList[i] + '.json';
 				if(!weeksLoaded.exists(sexList[i])) {
 					var week:WeekFile = getWeekFile(fileToCheck);
-					if(week != null) {
-						var weekFile:WeekData = new WeekData(week, sexList[i]);
+					if(week == null) continue;
+					var weekFile:WeekData = new WeekData(week, sexList[i]);
 
-						#if MODS_ALLOWED
-						if(j >= originalLength) {
-							weekFile.folder = directories[j].substring(Paths.mods().length, directories[j].length-1);
-						}
-						#end
-
-						if(weekFile != null && (isStoryMode == null || (isStoryMode && !weekFile.hideStoryMode) || (!isStoryMode && !weekFile.hideFreeplay))) {
-							weeksLoaded.set(sexList[i], weekFile);
-							weeksList.push(sexList[i]);
-						}
+					#if MODS_ALLOWED
+					if(j >= originalLength) {
+						weekFile.folder = directories[j].substring(Paths.mods().length, directories[j].length-1);
 					}
+					#end
+
+					if(weekFile != null && (isStoryMode == null || (isStoryMode && !weekFile.hideStoryMode) || (!isStoryMode && !weekFile.hideFreeplay))) {
+						weeksLoaded.set(sexList[i], weekFile);
+						weeksList.push(sexList[i]);
+					}
+					
 				}
 			}
 		}
@@ -117,20 +118,18 @@ class WeekData {
 				var listOfWeeks:Array<String> = CoolUtil.coolTextFile(directory + 'weekList.txt');
 				for (daWeek in listOfWeeks)
 				{
-					var path:String = directory + daWeek + '.json';
-					if(FileSystem.exists(path))
-					{
-						addWeek(daWeek, path, directories[i], i, originalLength);
-					}
+					var path:String = '${directory}${daWeek}.json';
+					if(!FileSystem.exists(path)) continue;
+					addWeek(daWeek, path, directories[i], i, originalLength);
+					
 				}
 
 				for (file in FileSystem.readDirectory(directory))
 				{
+					if(file.endsWith('.json')) continue;
 					var path = haxe.io.Path.join([directory, file]);
-					if (!FileSystem.isDirectory(path) && file.endsWith('.json'))
-					{
-						addWeek(file.substr(0, file.length - 5), path, directories[i], i, originalLength);
-					}
+					if (FileSystem.isDirectory(path)) continue;
+					addWeek(file.substr(0, file.length - 5), path, directories[i], i, originalLength);
 				}
 			}
 		}
