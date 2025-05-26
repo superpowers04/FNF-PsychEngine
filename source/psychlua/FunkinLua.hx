@@ -1572,8 +1572,9 @@ class FunkinLua {
 			if(func != null)
 				Lua_helper.add_callback(lua, name, func);
 		}
-
+		
 		try{
+			LuaL.dostring(lua, "math.randomseed()")
 			var isString:Bool = !FileSystem.exists(scriptName);
 			var result:Dynamic = null;
 			if(!isString)
